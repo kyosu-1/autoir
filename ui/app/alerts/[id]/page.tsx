@@ -106,7 +106,7 @@ const StatusBadge = ({ status }: { status: string }) => {
 
 export default function AlertDetail() {
   const [showRawData, setShowRawData] = useState(false)
-  const alert = mockAlert // 実際のAPIでは、params.idを使用して取得
+  const [currentAlert, setCurrentAlert] = useState(mockAlert) // 実際のAPIでは、params.idを使用して取得
 
   const handleCreateIncident = () => {
     // TODO: インシデント作成APIの呼び出し
@@ -114,7 +114,7 @@ export default function AlertDetail() {
 
   const handleStatusChange = (newStatus: Alert['status']) => {
     // TODO: ステータス更新APIの呼び出し
-    console.log(newStatus)
+    setCurrentAlert({ ...currentAlert, status: newStatus })
   }
 
   return (
@@ -122,15 +122,15 @@ export default function AlertDetail() {
       <div className="space-y-6">
         <div className="flex justify-between items-start">
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold">{alert.title}</h1>
+            <h1 className="text-2xl font-bold">{currentAlert.title}</h1>
             <div className="flex gap-2 items-center">
-              <SeverityBadge severity={alert.severity} />
-              <StatusBadge status={alert.status} />
+              <SeverityBadge severity={currentAlert.severity} />
+              <StatusBadge status={currentAlert.status} />
               <span className="text-sm text-gray-500">
-                Source: {alert.source}
+                Source: {currentAlert.source}
               </span>
               <span className="text-sm text-gray-500">
-                ID: {alert.source_alert_id}
+                ID: {currentAlert.source_alert_id}
               </span>
             </div>
           </div>
@@ -172,11 +172,11 @@ export default function AlertDetail() {
               <div className="space-y-4">
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Description</h3>
-                  <p className="mt-1">{alert.description}</p>
+                  <p className="mt-1">{currentAlert.description}</p>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Detection Time</h3>
-                  <p className="mt-1">{new Date(alert.detected_at).toLocaleString()}</p>
+                  <p className="mt-1">{new Date(currentAlert.detected_at).toLocaleString()}</p>
                 </div>
                 <div>
                   <div className="flex justify-between items-center mb-2">
@@ -190,7 +190,7 @@ export default function AlertDetail() {
                   </div>
                   {showRawData && (
                     <pre className="mt-1 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg overflow-x-auto text-sm font-mono">
-                      {alert.raw_data}
+                      {currentAlert.raw_data}
                     </pre>
                   )}
                 </div>
@@ -199,9 +199,9 @@ export default function AlertDetail() {
 
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
               <h2 className="text-lg font-semibold mb-4">Related Incidents</h2>
-              {alert.related_incidents.length > 0 ? (
+              {currentAlert.related_incidents.length > 0 ? (
                 <div className="space-y-4">
-                  {alert.related_incidents.map((incident) => (
+                  {currentAlert.related_incidents.map((incident) => (
                     <Link
                       key={incident.id}
                       href={`/incidents/${incident.id}`}
@@ -228,23 +228,23 @@ export default function AlertDetail() {
           </div>
 
           <div className="space-y-6">
-            {alert.llm_analysis && (
+            {currentAlert.llm_analysis && (
               <>
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
                   <h2 className="text-lg font-semibold mb-4">LLM Analysis</h2>
                   <div className="space-y-4">
                     <div>
                       <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Summary</h3>
-                      <p className="mt-1">{alert.llm_analysis.summary}</p>
+                      <p className="mt-1">{currentAlert.llm_analysis.summary}</p>
                     </div>
                     <div>
                       <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Severity Reasoning</h3>
-                      <p className="mt-1">{alert.llm_analysis.severity_reason}</p>
+                      <p className="mt-1">{currentAlert.llm_analysis.severity_reason}</p>
                     </div>
                     <div>
                       <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Recommended Actions</h3>
                       <ul className="mt-1 space-y-2">
-                        {alert.llm_analysis.recommended_actions.map((action, index) => (
+                        {currentAlert.llm_analysis.recommended_actions.map((action, index) => (
                           <li key={index} className="flex items-start gap-2">
                             <span className="text-blue-500">•</span>
                             <span>{action}</span>
@@ -258,7 +258,7 @@ export default function AlertDetail() {
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
                   <h2 className="text-lg font-semibold mb-4">Similar Alerts</h2>
                   <div className="space-y-4">
-                    {alert.llm_analysis.similar_alerts.map((similar) => (
+                    {currentAlert.llm_analysis.similar_alerts.map((similar) => (
                       <Link
                         key={similar.id}
                         href={`/alerts/${similar.id}`}
