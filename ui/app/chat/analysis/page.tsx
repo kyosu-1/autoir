@@ -36,59 +36,59 @@ interface AnalysisResult {
 }
 
 const mockAnalysis: AnalysisResult = {
-  summary: '複数のホストで検出された不審なプロセス実行は、既知のマルウェアファミリーの特徴と一致します。特に重要なサーバーでの検出があり、横断的な感染の可能性が示唆されます。',
+  summary: 'Multiple suspicious process executions detected match characteristics of a known malware family. Detection on critical servers suggests potential lateral movement.',
   severity_assessment: {
     level: 'HIGH',
-    reasoning: '1) 重要サーバーでの検出 2) 複数ホストへの影響 3) 既知の危険なマルウェアパターンとの一致',
+    reasoning: '1) Detection on critical servers 2) Multiple hosts affected 3) Match with known malicious patterns',
   },
   similar_cases: [
     {
       id: 'INC-2024-001',
-      title: 'マルウェア感染インシデント（2024年1月）',
+      title: 'Malware Infection Incident (Jan 2024)',
       similarity: 0.85,
-      key_findings: '同様のプロセス実行パターン、類似のC2通信',
-      resolution: 'ホスト隔離、マルウェア駆除、EDRポリシー強化',
+      key_findings: 'Similar process execution patterns, matching C2 communication',
+      resolution: 'Host isolation, malware removal, EDR policy enhancement',
     },
   ],
   recommended_actions: [
     {
       type: 'playbook',
       title: 'Isolate Compromised Host',
-      description: '感染が確認されたホストの隔離とフォレンジック収集',
+      description: 'Isolate infected host and collect forensics',
       confidence: 0.9,
       playbook_id: '2',
     },
     {
       type: 'investigation',
       title: 'Network Traffic Analysis',
-      description: '過去24時間のC2通信痕跡の調査',
+      description: 'Investigate C2 communication traces in the last 24 hours',
       confidence: 0.8,
     },
   ],
   evidence_analysis: [
     {
       source: 'EDR Logs',
-      findings: 'suspicious_process.exe の実行、レジストリ変更、特権昇格の試行',
+      findings: 'Execution of suspicious_process.exe, registry modifications, privilege escalation attempts',
       confidence: 0.95,
     },
     {
       source: 'Network Logs',
-      findings: '既知のC2サーバーとの通信試行',
+      findings: 'Communication attempts with known C2 servers',
       confidence: 0.85,
     },
   ],
   timeline_analysis: {
     anomalies: [
-      '深夜時間帯での管理者権限プロセスの実行',
-      '通常とは異なるネットワークポートの使用',
+      'Administrative process execution during off-hours',
+      'Unusual network port usage',
     ],
     patterns: [
-      '感染後30分以内でのC2通信確立',
-      '複数ホストへの同時感染試行',
+      'C2 communication established within 30 minutes post-infection',
+      'Simultaneous infection attempts on multiple hosts',
     ],
     recommendations: [
-      'EDRポリシーの即時強化',
-      '類似ホストの予防的監視強化',
+      'Immediate EDR policy enhancement',
+      'Preventive monitoring of similar hosts',
     ],
   },
 }
@@ -117,7 +117,7 @@ const ConfidenceBadge = ({ confidence }: { confidence: number }) => {
 
   return (
     <span className={`px-2 py-1 rounded-full text-xs font-medium ${colorClass}`}>
-      {Math.round(confidence * 100)}% 信頼度
+      {Math.round(confidence * 100)}% Confidence
     </span>
   )
 }
@@ -129,12 +129,12 @@ export default function Analysis() {
     <div className="container mx-auto max-w-6xl py-8 px-4">
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">インシデント分析</h1>
+          <h1 className="text-2xl font-bold">Incident Analysis</h1>
           <Link
             href="/chat"
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
           >
-            LLMに質問する
+            Ask LLM
           </Link>
         </div>
 
@@ -142,7 +142,7 @@ export default function Analysis() {
           <div className="space-y-6">
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
               <div className="flex justify-between items-start mb-4">
-                <h2 className="text-lg font-semibold">分析サマリー</h2>
+                <h2 className="text-lg font-semibold">Analysis Summary</h2>
                 <SeverityBadge level={analysis.severity_assessment.level} />
               </div>
               <div className="space-y-4">
@@ -150,7 +150,7 @@ export default function Analysis() {
                   {analysis.summary}
                 </p>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-2">重大度判定理由</h3>
+                  <h3 className="text-sm font-medium text-gray-500 mb-2">Severity Assessment Reasoning</h3>
                   <p className="text-sm text-gray-600">
                     {analysis.severity_assessment.reasoning}
                   </p>
@@ -159,7 +159,7 @@ export default function Analysis() {
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-              <h2 className="text-lg font-semibold mb-4">推奨アクション</h2>
+              <h2 className="text-lg font-semibold mb-4">Recommended Actions</h2>
               <div className="space-y-4">
                 {analysis.recommended_actions.map((action, index) => (
                   <div
@@ -197,7 +197,7 @@ export default function Analysis() {
 
           <div className="space-y-6">
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-              <h2 className="text-lg font-semibold mb-4">類似事例</h2>
+              <h2 className="text-lg font-semibold mb-4">Similar Cases</h2>
               <div className="space-y-4">
                 {analysis.similar_cases.map((case_) => (
                   <div
@@ -210,16 +210,16 @@ export default function Analysis() {
                         <p className="text-sm text-gray-500">{case_.id}</p>
                       </div>
                       <span className="text-sm text-gray-500">
-                        類似度: {Math.round(case_.similarity * 100)}%
+                        Similarity: {Math.round(case_.similarity * 100)}%
                       </span>
                     </div>
                     <div className="space-y-2 text-sm">
                       <p>
-                        <span className="font-medium">主な発見：</span>
+                        <span className="font-medium">Main Findings:</span>
                         {case_.key_findings}
                       </p>
                       <p>
-                        <span className="font-medium">解決方法：</span>
+                        <span className="font-medium">Resolution:</span>
                         {case_.resolution}
                       </p>
                     </div>
@@ -229,7 +229,7 @@ export default function Analysis() {
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-              <h2 className="text-lg font-semibold mb-4">証跡分析</h2>
+              <h2 className="text-lg font-semibold mb-4">Evidence Analysis</h2>
               <div className="space-y-4">
                 {analysis.evidence_analysis.map((evidence, index) => (
                   <div
@@ -249,10 +249,10 @@ export default function Analysis() {
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-              <h2 className="text-lg font-semibold mb-4">タイムライン分析</h2>
+              <h2 className="text-lg font-semibold mb-4">Timeline Analysis</h2>
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-2">検出された異常</h3>
+                  <h3 className="text-sm font-medium text-gray-500 mb-2">Detected Anomalies</h3>
                   <ul className="list-disc list-inside text-sm space-y-1">
                     {analysis.timeline_analysis.anomalies.map((anomaly, index) => (
                       <li key={index} className="text-gray-600">{anomaly}</li>
@@ -260,7 +260,7 @@ export default function Analysis() {
                   </ul>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-2">行動パターン</h3>
+                  <h3 className="text-sm font-medium text-gray-500 mb-2">Behavior Patterns</h3>
                   <ul className="list-disc list-inside text-sm space-y-1">
                     {analysis.timeline_analysis.patterns.map((pattern, index) => (
                       <li key={index} className="text-gray-600">{pattern}</li>
@@ -268,7 +268,7 @@ export default function Analysis() {
                   </ul>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-2">推奨対策</h3>
+                  <h3 className="text-sm font-medium text-gray-500 mb-2">Recommended Actions</h3>
                   <ul className="list-disc list-inside text-sm space-y-1">
                     {analysis.timeline_analysis.recommendations.map((rec, index) => (
                       <li key={index} className="text-gray-600">{rec}</li>
