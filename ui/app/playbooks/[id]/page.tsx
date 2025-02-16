@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 interface Playbook {
   id: string
@@ -146,8 +147,22 @@ const StepIcon = ({ type }: { type: string }) => {
   )
 }
 
+const StatusBadge = ({ status }: { status: string }) => {
+  const colorClass = {
+    success: 'bg-green-100 text-green-800',
+    failure: 'bg-red-100 text-red-800',
+  }[status] || 'bg-gray-100 text-gray-800'
+
+  return (
+    <span className={`px-2 py-1 rounded-full text-xs font-medium ${colorClass}`}>
+      {status.toUpperCase()}
+    </span>
+  )
+}
+
 export default function PlaybookDetail() {
   const params = useParams()
+  const router = useRouter()
   const playbookId = params.id as string
   const [playbook] = useState(mockPlaybooks[playbookId])
   const [isExecuting, setIsExecuting] = useState(false)
@@ -165,8 +180,9 @@ export default function PlaybookDetail() {
 
   const handleExecute = () => {
     setIsExecuting(true)
-    // TODO: APIコール
-    console.log('Executing playbook with parameters:', parameters)
+    // TODO: API呼び出し
+    console.log('Execute playbook with parameters:', parameters)
+    router.push(`/playbooks/${playbook.id}/run`)
   }
 
   // パラメータフォームの内容を動的に生成
@@ -306,25 +322,26 @@ export default function PlaybookDetail() {
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-              <h2 className="text-lg font-semibold mb-4">Execution History</h2>
-              {playbook.last_run ? (
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-500">Last run:</span>
-                    <span className="text-sm">{new Date(playbook.last_run.timestamp).toLocaleString()}</span>
+              <h2 className="text-lg font-semibold mb-4">実行履歴</h2>
+              <div className="space-y-4">
+                {playbook.last_run ? (
+                  <div className="space-y-2">
+                    <Link
+                      href={`/playbooks/${playbook.id}/run`}
+                      className="block p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600"
+                    >
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-500">
+                          最終実行: {new Date(playbook.last_run.timestamp).toLocaleString()}
+                        </span>
+                        <StatusBadge status={playbook.last_run.status} />
+                      </div>
+                    </Link>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-500">Status:</span>
-                    <span className={`text-sm ${
-                      playbook.last_run.status === 'success' ? 'text-green-500' : 'text-red-500'
-                    }`}>
-                      {playbook.last_run.status.toUpperCase()}
-                    </span>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-sm text-gray-500">No execution history</p>
-              )}
+                ) : (
+                  <p className="text-sm text-gray-500">実行履歴なし</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
