@@ -7,6 +7,12 @@ interface ChatMessage {
   role: 'user' | 'assistant'
   content: string
   timestamp: string
+  suggested_actions?: Array<{
+    type: 'playbook' | 'link' | 'command'
+    title: string
+    description: string
+    action: string
+  }>
 }
 
 const mockMessages: ChatMessage[] = [
@@ -19,10 +25,62 @@ const mockMessages: ChatMessage[] = [
   {
     id: '2',
     role: 'assistant',
-    content: 'Based on the logs, this IP has attempted to login 50 times in the last hour with different usernames. This pattern suggests a brute force attack. I recommend:\n\n1. Block this IP immediately\n2. Check if any login attempts were successful\n3. Review authentication logs for other suspicious IPs',
+    content: 'Based on the logs, this IP has attempted to login 50 times in the last hour with different usernames. This pattern suggests a brute force attack. I recommend taking immediate action to block this IP and investigate any successful logins.',
     timestamp: '2024-02-16T10:00:05Z',
+    suggested_actions: [
+      {
+        type: 'playbook',
+        title: 'Block Malicious IP',
+        description: 'Execute playbook to block IP 192.168.1.100 across all firewalls',
+        action: 'execute_playbook:1?ip_address=192.168.1.100&reason=brute_force_attempt',
+      },
+      {
+        type: 'command',
+        title: 'Check Successful Logins',
+        description: 'Search for successful logins from this IP',
+        action: 'search_logs:authentication success AND source.ip:192.168.1.100',
+      },
+      {
+        type: 'link',
+        title: 'View Similar Incidents',
+        description: 'View past incidents involving brute force attempts',
+        action: '/incidents?type=brute_force',
+      },
+    ],
   },
 ]
+
+const ActionButton = ({ action }: { action: NonNullable<ChatMessage['suggested_actions']>[number] }) => {
+  const handleClick = () => {
+    // TODO: 各アクションタイプに応じた処理
+    console.log('Execute action:', action)
+  }
+
+  const iconClass = {
+    playbook: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
+    link: 'M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14',
+    command: 'M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
+  }[action.type]
+
+  return (
+    <button
+      onClick={handleClick}
+      className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors text-left"
+    >
+      <div className="mt-1">
+        <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={iconClass} />
+        </svg>
+      </div>
+      <div className="flex-1">
+        <div className="font-medium">{action.title}</div>
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          {action.description}
+        </div>
+      </div>
+    </button>
+  )
+}
 
 const ChatMessage = ({ message }: { message: ChatMessage }) => {
   const isUser = message.role === 'user'
@@ -34,19 +92,33 @@ const ChatMessage = ({ message }: { message: ChatMessage }) => {
           AI
         </div>
       )}
-      <div
-        className={`max-w-[80%] rounded-lg p-4 ${
-          isUser
-            ? 'bg-blue-50 dark:bg-blue-900'
-            : 'bg-gray-50 dark:bg-gray-700'
-        }`}
-      >
-        <div className="flex flex-col gap-2">
-          <p className="whitespace-pre-wrap">{message.content}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 self-end">
-            {new Date(message.timestamp).toLocaleString()}
-          </p>
+      <div className="max-w-[80%] space-y-4">
+        <div
+          className={`rounded-lg p-4 ${
+            isUser
+              ? 'bg-blue-50 dark:bg-blue-900'
+              : 'bg-gray-50 dark:bg-gray-700'
+          }`}
+        >
+          <div className="flex flex-col gap-2">
+            <p className="whitespace-pre-wrap">{message.content}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 self-end">
+              {new Date(message.timestamp).toLocaleString()}
+            </p>
+          </div>
         </div>
+        {message.suggested_actions && (
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              Suggested Actions
+            </h3>
+            <div className="space-y-2">
+              {message.suggested_actions.map((action, index) => (
+                <ActionButton key={index} action={action} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
       {isUser && (
         <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white text-sm">
@@ -79,8 +151,22 @@ export default function Chat() {
       const assistantMessage: ChatMessage = {
         id: String(Date.now() + 1),
         role: 'assistant',
-        content: 'I am analyzing your request. This is a mock response for now.',
+        content: 'I am analyzing your request. Here are my findings and recommendations.',
         timestamp: new Date().toISOString(),
+        suggested_actions: [
+          {
+            type: 'playbook',
+            title: 'Run Security Scan',
+            description: 'Execute a comprehensive security scan on the affected systems',
+            action: 'execute_playbook:3?target=affected_systems',
+          },
+          {
+            type: 'link',
+            title: 'View Documentation',
+            description: 'Read our security response playbook',
+            action: '/docs/security-response',
+          },
+        ],
       }
       setMessages((prev) => [...prev, assistantMessage])
     }, 1000)
@@ -89,7 +175,7 @@ export default function Chat() {
   return (
     <div className="container mx-auto max-w-6xl py-8 px-4">
       <div className="flex flex-col h-[calc(100vh-4rem)] gap-6">
-        <div className="flex-1 w-full overflow-y-auto space-y-4 pb-4">
+        <div className="flex-1 w-full overflow-y-auto space-y-6 pb-4">
           {messages.map((message) => (
             <ChatMessage key={message.id} message={message} />
           ))}
@@ -97,7 +183,7 @@ export default function Chat() {
         <div className="flex gap-2 w-full">
           <input
             type="text"
-            placeholder="Type your message..."
+            placeholder="Ask about incidents, alerts, or request analysis..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}

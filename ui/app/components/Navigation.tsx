@@ -40,6 +40,16 @@ export default function Navigation() {
                 Postmortems
               </Link>
               <Link
+                href="/playbooks"
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  isActive('/playbooks')
+                    ? 'bg-blue-500 text-white'
+                    : 'text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white'
+                }`}
+              >
+                Playbooks
+              </Link>
+              <Link
                 href="/settings"
                 className={`px-3 py-2 rounded-md text-sm font-medium ${
                   isActive('/settings')
