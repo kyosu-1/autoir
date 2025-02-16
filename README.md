@@ -40,7 +40,7 @@ LLMを活用した自動分析機能により、効率的なインシデント�
 ### バックエンド
 - Go
 - Protocol Buffers
-- gRPC
+- ConnectRPC
 
 ### インフラ/その他
 - OpenAI API (LLM)
