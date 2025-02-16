@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 interface ChatMessage {
   id: string
@@ -130,8 +131,13 @@ const ChatMessage = ({ message }: { message: ChatMessage }) => {
 }
 
 export default function Chat() {
+  const router = useRouter()
   const [messages, setMessages] = useState<ChatMessage[]>(mockMessages)
   const [input, setInput] = useState('')
+
+  const handleAnalyze = () => {
+    router.push('/chat/analysis')
+  }
 
   const handleSend = () => {
     if (!input.trim()) return
@@ -175,6 +181,18 @@ export default function Chat() {
   return (
     <div className="container mx-auto max-w-6xl py-8 px-4">
       <div className="flex flex-col h-[calc(100vh-4rem)] gap-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold">LLMアシスタント</h1>
+          <button
+            onClick={handleAnalyze}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
+            詳細分析を表示
+          </button>
+        </div>
         <div className="flex-1 w-full overflow-y-auto space-y-6 pb-4">
           {messages.map((message) => (
             <ChatMessage key={message.id} message={message} />
@@ -183,7 +201,7 @@ export default function Chat() {
         <div className="flex gap-2 w-full">
           <input
             type="text"
-            placeholder="Ask about incidents, alerts, or request analysis..."
+            placeholder="インシデントについて質問してください..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
@@ -193,7 +211,7 @@ export default function Chat() {
             onClick={handleSend}
             className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            Send
+            送信
           </button>
         </div>
       </div>
