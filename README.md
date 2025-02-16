@@ -32,7 +32,7 @@ LLMを活用した自動分析機能により、効率的なインシデント�
 ## 技術スタック
 
 ### フロントエンド
-- Next.js 14 (App Router)
+- Next.js 15 (App Router)
 - TypeScript
 - Tailwind CSS
 - React
