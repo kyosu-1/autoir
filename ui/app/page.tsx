@@ -339,9 +339,10 @@ export default function Home() {
                 ) : (
                   <div className="space-y-4">
                     {mockAlerts.map((alert) => (
-                      <div
+                      <Link
                         key={alert.id}
-                        className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4"
+                        href={`/alerts/${alert.id}`}
+                        className="block bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow"
                       >
                         <div className="space-y-2">
                           <div className="flex justify-between items-start">
@@ -356,8 +357,14 @@ export default function Home() {
                           <p className="text-sm text-gray-500 dark:text-gray-400">
                             Detected: {new Date(alert.detected_at).toLocaleString()}
                           </p>
+                          <div className="flex justify-end items-center text-sm text-blue-500 hover:text-blue-600">
+                            <span>View Details</span>
+                            <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </div>
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 )}
