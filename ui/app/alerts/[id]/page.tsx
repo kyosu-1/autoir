@@ -114,6 +114,7 @@ export default function AlertDetail() {
 
   const handleStatusChange = (newStatus: Alert['status']) => {
     // TODO: ステータス更新APIの呼び出し
+    console.log(newStatus)
   }
 
   return (
