@@ -1,0 +1,129 @@
+syntax = "proto3";
+
+package autoir;
+
+option go_package = "github.com/yourusername/autoir/proto";
+
+import "google/protobuf/timestamp.proto";
+
+service AutoIRService {
+  // インシデント関連
+  rpc ListIncidents(ListIncidentsRequest) returns (ListIncidentsResponse);
+  rpc GetIncident(GetIncidentRequest) returns (Incident);
+  rpc CreateIncident(CreateIncidentRequest) returns (Incident);
+  rpc UpdateIncident(UpdateIncidentRequest) returns (Incident);
+
+  // アラート関連
+  rpc ListAlerts(ListAlertsRequest) returns (ListAlertsResponse);
+  rpc GetAlert(GetAlertRequest) returns (Alert);
+
+  // LLMチャット関連
+  rpc Chat(ChatRequest) returns (ChatResponse);
+}
+
+// 共通の列挙型
+enum Severity {
+  SEVERITY_UNSPECIFIED = 0;
+  SEVERITY_LOW = 1;
+  SEVERITY_MEDIUM = 2;
+  SEVERITY_HIGH = 3;
+  SEVERITY_CRITICAL = 4;
+}
+
+enum IncidentStatus {
+  INCIDENT_STATUS_UNSPECIFIED = 0;
+  INCIDENT_STATUS_NEW = 1;
+  INCIDENT_STATUS_TRIAGE = 2;
+  INCIDENT_STATUS_CONTAIN = 3;
+  INCIDENT_STATUS_RECOVER = 4;
+  INCIDENT_STATUS_CLOSED = 5;
+}
+
+// インシデント関連メッセージ
+message Incident {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  Severity severity = 4;
+  IncidentStatus status = 5;
+  string reported_by = 6;
+  string source_type = 7;
+  google.protobuf.Timestamp detected_at = 8;
+  google.protobuf.Timestamp closed_at = 9;
+  google.protobuf.Timestamp created_at = 10;
+  repeated Alert related_alerts = 11;
+}
+
+message ListIncidentsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  // フィルタリング条件
+  optional Severity severity = 3;
+  optional IncidentStatus status = 4;
+}
+
+message ListIncidentsResponse {
+  repeated Incident incidents = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+message GetIncidentRequest {
+  string incident_id = 1;
+}
+
+message CreateIncidentRequest {
+  string title = 1;
+  string description = 2;
+  Severity severity = 3;
+  string source_type = 4;
+  repeated string alert_ids = 5;
+}
+
+message UpdateIncidentRequest {
+  string incident_id = 1;
+  optional string title = 2;
+  optional string description = 3;
+  optional Severity severity = 4;
+  optional IncidentStatus status = 5;
+}
+
+// アラート関連メッセージ
+message Alert {
+  string id = 1;
+  string source = 2;
+  string source_alert_id = 3;
+  string title = 4;
+  string description = 5;
+  Severity severity = 6;
+  string status = 7;
+  google.protobuf.Timestamp detected_at = 8;
+  google.protobuf.Timestamp created_at = 9;
+}
+
+message ListAlertsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  optional Severity severity = 3;
+}
+
+message ListAlertsResponse {
+  repeated Alert alerts = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+message GetAlertRequest {
+  string alert_id = 1;
+}
+
+// LLMチャット関連メッセージ
+message ChatRequest {
+  string message = 1;
+  string incident_id = 2;
+}
+
+message ChatResponse {
+  string message = 1;
+  repeated string suggested_actions = 2;
+}
